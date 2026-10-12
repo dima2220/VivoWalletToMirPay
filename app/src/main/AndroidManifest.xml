@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.vivotomirpay.stub"
+    android:versionCode="100"
+    android:versionName="1.0.0">
+
+    <uses-sdk
+        android:minSdkVersion="25"
+        android:targetSdkVersion="35" />
+
+    <!-- Для чтения списка установленных приложений и запуска Mir Pay / любого выбранного пакета -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <!-- Опциональная короткая вибрация при перехвате двойного нажатия -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <queries>
+        <package android:name="ru.nspk.mirpay" />
+        <package android:name="com.vivo.wallet" />
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="vivo.intent.action.NFC_BUS_SWINGSPLASH" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <!-- Метаданные Vivo, которые проверяет системный сервис при двойном нажатии кнопки питания -->
+        <meta-data
+            android:name="com.vivo.wallet.support.typeswing"
+            android:value="true" />
+        <meta-data
+            android:name="com.vivo.wallet.nfc.SupportDoubleClick"
+            android:value="true" />
+        <meta-data
+            android:name="com.vivo.wallet.nfc.CommonSupportDoubleClick"
+            android:value="true" />
+        <meta-data
+            android:name="com.vivo.wallet.nfc.supportVersion"
+            android:value="2" />
+        <meta-data
+            android:name="com.vivo.pay.nfc.supportVersion"
+            android:value="1" />
+
+        <!-- Главное окно настройки заглушки в стиле Android 13 -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Activity-перехватчик двойного нажатия кнопки питания Vivo (NFC_BUS_SWINGSPLASH) -->
+        <activity
+            android:name=".SwipeEntryActivity"
+            android:exported="true"
+            android:label="@string/swipe_activity_label"
+            android:theme="@style/TransparentSwipeTheme"
+            android:taskAffinity="com.vivotomirpay.stub.swipe"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|density">
+            <intent-filter>
+                <action android:name="vivo.intent.action.NFC_BUS_SWINGSPLASH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
