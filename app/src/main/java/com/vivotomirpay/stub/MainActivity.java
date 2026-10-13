@@ -12,6 +12,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -22,15 +24,26 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Главное окно настроек заглушки (функционал первой версии + интерфейс в стиле Android 13 Material You).
+ * Главное окно настроек заглушки.
+ *
+ * Карточки UI:
+ *   1. «Какое приложение запускать при двойном нажатии кнопки питания» —
+ *      пресеты Mir Pay / СБПэй / Vivo Wallet / Фонарик / Circle to Search,
+ *      поле ввода packageName, кнопка «Все приложения…» с динамическим поиском.
+ *   2. «Обработчик кнопки питания Vivo» — статусная плашка, кнопки проверки запуска,
+ *      вызова системного интента NFC_BUS_SWINGSPLASH, открытия свойств обработчика.
+ *   3. «Журнал последнего вызова» — ограниченный по длине diagnostic log.
+ *
+ * Над каждой группой кнопок есть короткая пояснительная подсказка в стиле
+ * Material You, чтобы пользователю было понятно «зачем эта кнопка и что с ней делать».
  */
 public class MainActivity extends Activity {
 
@@ -39,6 +52,7 @@ public class MainActivity extends Activity {
     private EditText packageEditText;
     private TextView targetAppStatusView;
     private TextView logTextView;
+    private TextView assistantStatusView;
     private String currentDefaultSwipePkg = null;
 
     @Override
@@ -65,14 +79,14 @@ public class MainActivity extends Activity {
 
         // Заголовок в стиле Android 13 Settings
         TextView headline = new TextView(this);
-        headline.setText("Vivo -> Mir Pay");
+        headline.setText("Double Power Key");
         headline.setTextColor(Color.parseColor("#FFE2E2E9"));
         headline.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
         headline.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         root.addView(headline);
 
         TextView subhead = new TextView(this);
-        subhead.setText("Заглушка двойного нажатия кнопки питания для смартфонов Vivo");
+        subhead.setText("Переназначение двойного нажатия кнопки питания для смартфонов Vivo / iQOO (OriginOS / FuntouchOS)");
         subhead.setTextColor(Color.parseColor("#FFC4C6D0"));
         subhead.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         subhead.setPadding(0, dp(6), 0, dp(16));
@@ -88,19 +102,20 @@ public class MainActivity extends Activity {
         root.addView(powerHandlerChip, pillLp);
 
         // =========================================================================
-        // КАРТОЧКА 1: Целевое приложение при двойном нажатии кнопки питания
+        // КАРТОЧКА 1: Целевое приложение / спец-функция
         // =========================================================================
         LinearLayout targetCard = createM3Card();
-        targetCard.addView(createM3SectionHeader("Какое приложение запускать", "⚡"));
+        targetCard.addView(createM3SectionHeader("Что запускает двойное нажатие", "⚡"));
 
-        TextView defaultAppLabel = new TextView(this);
-        defaultAppLabel.setText("Выберите приложение, которое будет мгновенно открываться при двойном нажатии кнопки питания:");
-        defaultAppLabel.setTextColor(Color.parseColor("#FFC4C6D0"));
-        defaultAppLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        defaultAppLabel.setPadding(0, dp(6), 0, dp(10));
-        targetCard.addView(defaultAppLabel);
+        targetCard.addView(createHelpText(
+                "Выберите, что произойдёт при двойном нажатии кнопки питания. "
+                        + "Можно выбрать обычное приложение (Mir Pay, СБПэй и др.) или одну из "
+                        + "спец-функций — фонарик или Circle to Search. "
+                        + "Circle to Search использует тот же механизм, что и MiCTS: "
+                        + "вызов VoiceInteractionService через reflection. Без root, без accessibility."
+        ));
 
-        // Быстрые чипы выбора приложения в стиле Android 13
+        // Быстрые чипы выбора пресета в стиле Android 13
         LinearLayout presetsRow = new LinearLayout(this);
         presetsRow.setOrientation(LinearLayout.HORIZONTAL);
         addM3ChipButton(presetsRow, "Mir Pay", "ru.nspk.mirpay");
@@ -110,13 +125,25 @@ public class MainActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        presetsLp.bottomMargin = dp(10);
+        presetsLp.bottomMargin = dp(8);
         targetCard.addView(presetsRow, presetsLp);
+
+        // Второй ряд — спец-функции (не packageName, а special:*)
+        LinearLayout specialsRow = new LinearLayout(this);
+        specialsRow.setOrientation(LinearLayout.HORIZONTAL);
+        addM3ChipButton(specialsRow, "Фонарик", PrefsHelper.SPECIAL_TORCH);
+        addM3ChipButton(specialsRow, "Circle to Search", PrefsHelper.SPECIAL_CIRCLE_TO_SEARCH);
+        LinearLayout.LayoutParams specialsLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        specialsLp.bottomMargin = dp(10);
+        targetCard.addView(specialsRow, specialsLp);
 
         packageEditText = new EditText(this);
         packageEditText.setText(PrefsHelper.getTargetPackage(this));
         packageEditText.setTextColor(Color.parseColor("#FFE2E2E9"));
-        packageEditText.setHint("Имя пакета (например, ru.nspk.mirpay)");
+        packageEditText.setHint("Имя пакета (ru.nspk.mirpay) или special:torch / special:circle_to_search");
         packageEditText.setHintTextColor(Color.parseColor("#FF8E9099"));
         packageEditText.setSingleLine(true);
         packageEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -144,7 +171,6 @@ public class MainActivity extends Activity {
                 String pkg = packageEditText.getText().toString().trim();
                 PrefsHelper.setTargetPackage(MainActivity.this, pkg);
                 refreshAllStates();
-                Toast.makeText(MainActivity.this, "Сохранено: " + pkg, Toast.LENGTH_SHORT).show();
             }
         });
         LinearLayout.LayoutParams half1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
@@ -161,6 +187,11 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams half2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         rowSavePick.addView(pickAppBtn, half2);
         targetCard.addView(rowSavePick);
+
+        targetCard.addView(createHelpText(
+                "«Сохранить» — записывает выбор. «Все приложения…» — открывает список "
+                        + "с динамическим поиском по названию или packageName."
+        ), createHelpLp());
 
         CheckBox cbVibrate = new CheckBox(this);
         cbVibrate.setText("Короткая вибрация при двойном нажатии кнопки питания");
@@ -198,7 +229,7 @@ public class MainActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        rowMarginLp.bottomMargin = dp(10);
+        rowMarginLp.bottomMargin = dp(6);
 
         Button testLaunchBtn = createM3PrimaryButton("Проверить запуск выбранного приложения");
         testLaunchBtn.setOnClickListener(new View.OnClickListener() {
@@ -211,6 +242,16 @@ public class MainActivity extends Activity {
             }
         });
         handlerCard.addView(testLaunchBtn, rowMarginLp);
+        handlerCard.addView(createHelpText(
+                "Имитирует двойное нажатие питания, не меняя системного обработчика. "
+                        + "Удобно проверить, запускается ли выбранное приложение."
+        ), createHelpLp());
+
+        LinearLayout.LayoutParams rowMarginLp2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        rowMarginLp2.bottomMargin = dp(6);
 
         Button triggerSystemSwipeBtn = createM3TonalButton("Вызвать NFC_BUS_SWINGSPLASH (Выбрать «Всегда»)");
         triggerSystemSwipeBtn.setOnClickListener(new View.OnClickListener() {
@@ -219,7 +260,18 @@ public class MainActivity extends Activity {
                 triggerVivoSwipeIntent();
             }
         });
-        handlerCard.addView(triggerSystemSwipeBtn, rowMarginLp);
+        handlerCard.addView(triggerSystemSwipeBtn, rowMarginLp2);
+        handlerCard.addView(createHelpText(
+                "Отправляет тот же системный Intent, что Vivo отправляет при двойном нажатии кнопки "
+                        + "питания. Появится системное окно выбора — выберите «Double Power Key» и "
+                        + "отметьте «Всегда», чтобы заглушка стала постоянным обработчиком."
+        ), createHelpLp());
+
+        LinearLayout.LayoutParams rowMarginLp3 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        rowMarginLp3.bottomMargin = dp(6);
 
         Button clearDefaultBtn = createM3SecondaryButton("Открыть свойства текущего обработчика по умолчанию");
         clearDefaultBtn.setOnClickListener(new View.OnClickListener() {
@@ -229,15 +281,83 @@ public class MainActivity extends Activity {
                 openAppDetails(pkgToOpen);
             }
         });
-        handlerCard.addView(clearDefaultBtn);
+        handlerCard.addView(clearDefaultBtn, rowMarginLp3);
+        handlerCard.addView(createHelpText(
+                "Открывает системные настройки приложения, которое сейчас назначено "
+                        + "обработчиком двойного нажатия. Там можно сбросить выбор, чтобы "
+                        + "снова вызвать окно «Всегда»."
+        ), createHelpLp());
 
         root.addView(handlerCard, createCardMargin());
 
         // =========================================================================
-        // КАРТОЧКА 3: Диагностический журнал
+        // КАРТОЧКА 3: Ассистент по умолчанию
+        // =========================================================================
+        LinearLayout assistantCard = createM3Card();
+        assistantCard.addView(createM3SectionHeader("Ассистент по умолчанию", "🤖"));
+
+        assistantCard.addView(createHelpText(
+                "Пресет Circle to Search запускает ассистента, который выбран "
+                        + "как цифровой помощник по умолчанию в системе. Если хотите, чтобы "
+                        + "Circle to Search открывал Gemini (а не Google), выберите Gemini "
+                        + "как ассистента по умолчанию. На Android 13+ Gemini интегрирован в "
+                        + "Google-приложение: откройте Google-приложение → профиль → Настройки "
+                        + "→ Gemini → включите «Использовать Gemini как ассистента». После этого "
+                        + "в статусе ниже появится «Gemini»."
+        ));
+
+        final TextView assistantStatus = new TextView(this);
+        assistantStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        assistantStatus.setPadding(dp(4), dp(6), dp(4), dp(12));
+        assistantCard.addView(assistantStatus);
+
+        Button changeAssistantBtn = createM3PrimaryButton("Изменить ассистента по умолчанию");
+        changeAssistantBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDefaultAssistantSettings();
+            }
+        });
+        LinearLayout.LayoutParams changeAssistantLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        changeAssistantLp.bottomMargin = dp(6);
+        assistantCard.addView(changeAssistantBtn, changeAssistantLp);
+
+        Button openGoogleAppBtn = createM3SecondaryButton("Открыть Google-приложение (для переключения на Gemini)");
+        openGoogleAppBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    PackageManager pm = getPackageManager();
+                    Intent launch = pm.getLaunchIntentForPackage("com.google.android.googlequicksearchbox");
+                    if (launch != null) {
+                        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(launch);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        });
+        assistantCard.addView(openGoogleAppBtn);
+
+        // Сохраняем ссылку на статус-вью, чтобы refreshAllStates() обновлял его.
+        assistantStatusView = assistantStatus;
+
+        root.addView(assistantCard, createCardMargin());
+
+        // =========================================================================
+        // КАРТОЧКА 4: Диагностический журнал
         // =========================================================================
         LinearLayout logCard = createM3Card();
         logCard.addView(createM3SectionHeader("Журнал последнего вызова", "📋"));
+
+        logCard.addView(createHelpText(
+                "Записывается только последний вызов. Action и значения extras обрезаются "
+                        + "до 100 символов, общий лог — до 1000 символов. Это защищает приложение "
+                        + "от раздувания SharedPreferences и UI произвольными интентами."
+        ), createHelpLp());
 
         logTextView = new TextView(this);
         logTextView.setTextColor(Color.parseColor("#FFC4C6D0"));
@@ -316,7 +436,11 @@ public class MainActivity extends Activity {
         statusDetailsView.setText(sb.toString().trim());
 
         String targetPkg = PrefsHelper.getTargetPackage(this);
-        if (isPackageInstalled(targetPkg)) {
+        if (targetPkg.startsWith(PrefsHelper.SPECIAL_PREFIX)) {
+            // Для спец-значений не проверяем установку пакета — просто показываем подсказку.
+            targetAppStatusView.setText("⚙ Спец-функция: " + describeSpecial(targetPkg));
+            targetAppStatusView.setTextColor(Color.parseColor("#FFA8C7FA"));
+        } else if (isPackageInstalled(targetPkg)) {
             String label = getAppLabel(targetPkg, targetPkg);
             targetAppStatusView.setText("✓ Пакет установлен: " + label + " (" + targetPkg + ")");
             targetAppStatusView.setTextColor(Color.parseColor("#FFA6F2D1"));
@@ -325,7 +449,94 @@ public class MainActivity extends Activity {
             targetAppStatusView.setTextColor(Color.parseColor("#FFFFB4AB"));
         }
 
+        // Статус ассистента по умолчанию.
+        if (assistantStatusView != null) {
+            String assistant = getCurrentDefaultAssistant();
+            boolean isGemini = assistant != null
+                    && assistant.toLowerCase().contains("com.google.android.apps.bard");
+            boolean isGoogle = assistant != null
+                    && assistant.toLowerCase().contains("com.google.android.googlequicksearchbox");
+            if (isGemini) {
+                assistantStatusView.setText("✓ Ассистент по умолчанию: " + assistant
+                        + ". Circle to Search будет открывать Gemini.");
+                assistantStatusView.setTextColor(Color.parseColor("#FFA6F2D1"));
+            } else if (isGoogle) {
+                assistantStatusView.setText("ℹ Ассистент по умолчанию: " + assistant
+                        + ". Circle to Search будет открывать Google. Чтобы открывал Gemini — "
+                        + "переключите ассистента кнопкой ниже.");
+                assistantStatusView.setTextColor(Color.parseColor("#FFA8C7FA"));
+            } else {
+                assistantStatusView.setText("⚠ Ассистент по умолчанию: " + assistant
+                        + ". Нажмите кнопку ниже и выберите Google или Gemini.");
+                assistantStatusView.setTextColor(Color.parseColor("#FFFFB4AB"));
+            }
+        }
+
         logTextView.setText(PrefsHelper.getLastTriggerLog(this));
+    }
+
+    /** Читает текущего ассистента по умолчанию из Settings.Secure.ASSISTANT.
+     *  Возвращает «Google (com.google.android.googlequicksearchbox)» или «не задан». */
+    private String getCurrentDefaultAssistant() {
+        try {
+            String assistant = android.provider.Settings.Secure.getString(
+                    getContentResolver(), "assistant");
+            if (assistant == null || assistant.isEmpty()) {
+                return "не задан";
+            }
+            String pkg = assistant;
+            if (assistant.contains("/")) {
+                pkg = assistant.split("/", 2)[0];
+            }
+            String label = getAppLabel(pkg, pkg);
+            if (label == null || label.equals(pkg)) {
+                return assistant;
+            }
+            return label + " (" + pkg + ")";
+        } catch (Exception e) {
+            return "ошибка чтения: " + e.getMessage();
+        }
+    }
+
+    /** Открывает системные настройки «Цифровой ассистент по умолчанию».
+     *  Пробует несколько intent'ов по убыванию специфичности:
+     *    1) android.settings.VOICE_INPUT_SETTINGS — открывает «Голос и активность»
+     *    2) android.settings.MANAGE_DEFAULT_APPS_SETTINGS — открывает «Приложения по умолчанию»
+     *    3) android.settings.MANAGE_ASSISTANT — Android 14+, недокументированный
+     *    4) Настройки приложения Google (если совсем ничего не сработало). */
+    private void openDefaultAssistantSettings() {
+        String[] actions = new String[]{
+                "android.settings.VOICE_INPUT_SETTINGS",
+                "android.settings.MANAGE_DEFAULT_APPS_SETTINGS",
+                "android.settings.MANAGE_ASSISTANT",
+        };
+        for (String action : actions) {
+            try {
+                Intent intent = new Intent(action);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                return;
+            } catch (Exception ignored) {
+                // try next
+            }
+        }
+        // Fallback: открыть настройки приложения Google.
+        try {
+            Intent intent = new Intent(
+                    android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.fromParts("package",
+                    "com.google.android.googlequicksearchbox", null));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private String describeSpecial(String pkg) {
+        if (PrefsHelper.SPECIAL_TORCH.equals(pkg)) return "Фонарик (вкл/выкл вспышкой)";
+        if (PrefsHelper.SPECIAL_CIRCLE_TO_SEARCH.equals(pkg))
+            return "Circle to Search (через VoiceInteractionService, как MiCTS)";
+        return pkg;
     }
 
     private boolean isPackageInstalled(String pkg) {
@@ -358,8 +569,7 @@ public class MainActivity extends Activity {
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             intent.putExtra("lb_from", "2");
             startActivity(intent);
-        } catch (Exception e) {
-            Toast.makeText(this, "Ошибка вызова: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (Exception ignored) {
         }
     }
 
@@ -368,8 +578,7 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             intent.setData(Uri.fromParts("package", pkg, null));
             startActivity(intent);
-        } catch (Exception e) {
-            Toast.makeText(this, "Не удалось открыть настройки: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (Exception ignored) {
         }
     }
 
@@ -409,48 +618,144 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** Диалог выбора приложения с динамическим поиском по названию или packageName. */
     private void showInstalledAppsPicker() {
-        PackageManager pm = getPackageManager();
+        final PackageManager pm = getPackageManager();
         Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> list = pm.queryIntentActivities(mainIntent, 0);
 
-        final List<AppEntry> entries = new ArrayList<>();
+        final List<AppEntry> allEntries = new ArrayList<>();
         for (ResolveInfo ri : list) {
             if (ri.activityInfo != null) {
                 String pkg = ri.activityInfo.packageName;
                 if (!getPackageName().equals(pkg)) {
                     String label = String.valueOf(ri.loadLabel(pm));
-                    entries.add(new AppEntry(label, pkg));
+                    allEntries.add(new AppEntry(label, pkg));
                 }
             }
         }
-        Collections.sort(entries, new Comparator<AppEntry>() {
+        Collections.sort(allEntries, new Comparator<AppEntry>() {
             @Override
             public int compare(AppEntry a, AppEntry b) {
                 return a.label.compareToIgnoreCase(b.label);
             }
         });
 
-        CharSequence[] items = new CharSequence[entries.size()];
-        for (int i = 0; i < entries.size(); i++) {
-            AppEntry e = entries.get(i);
-            items[i] = e.label + "\n(" + e.packageName + ")";
-        }
+        // Кастомный вид для диалога: EditText для поиска + ListView.
+        final EditText searchBox = new EditText(this);
+        searchBox.setHint("Поиск: введите название или имя пакета…");
+        searchBox.setHintTextColor(Color.parseColor("#FF8E9099"));
+        searchBox.setTextColor(Color.parseColor("#FFE2E2E9"));
+        searchBox.setSingleLine(true);
+        searchBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        int pad8 = dp(12);
+        searchBox.setPadding(pad8, pad8, pad8, pad8);
 
-        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle("Выберите приложение")
-                .setItems(items, new DialogInterface.OnClickListener() {
+        final LinearLayout listContainer = new LinearLayout(this);
+        listContainer.setOrientation(LinearLayout.VERTICAL);
+
+        final Runnable[] updateList = new Runnable[1];
+
+        updateList[0] = () -> {
+            String q = searchBox.getText().toString().trim().toLowerCase(Locale.getDefault());
+            listContainer.removeAllViews();
+            for (AppEntry e : allEntries) {
+                boolean match = q.isEmpty()
+                        || e.label.toLowerCase(Locale.getDefault()).contains(q)
+                        || e.packageName.toLowerCase(Locale.getDefault()).contains(q);
+                if (!match) continue;
+                TextView item = new TextView(this);
+                item.setText(e.label + "\n" + e.packageName);
+                item.setTextColor(Color.parseColor("#FFE2E2E9"));
+                item.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                int p = dp(12);
+                item.setPadding(p, p, p, p);
+                GradientDrawable itemBg = new GradientDrawable();
+                itemBg.setColor(Color.parseColor("#FF1D2026"));
+                itemBg.setCornerRadius(dp(12));
+                item.setBackground(itemBg);
+                LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                ilp.bottomMargin = dp(6);
+                item.setLayoutParams(ilp);
+                item.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        AppEntry chosen = entries.get(which);
-                        packageEditText.setText(chosen.packageName);
-                        PrefsHelper.setTargetPackage(MainActivity.this, chosen.packageName);
+                    public void onClick(View v) {
+                        packageEditText.setText(e.packageName);
+                        PrefsHelper.setTargetPackage(MainActivity.this, e.packageName);
                         refreshAllStates();
+                        // Диалог закроется через dismiss, который мы повесим ниже —
+                        // но мы не храним ссылку на него из этого Runnable, поэтому
+                        // закрываем через аккуратный трюк: убираем фокус и шлём BACK.
+                        // Проще: обратиться через глобальную переменную dialog.
+                        if (currentPickerDialog != null) {
+                            currentPickerDialog.dismiss();
+                        }
                     }
-                })
+                });
+                listContainer.addView(item);
+            }
+        };
+
+        searchBox.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateList[0].run();
+            }
+        });
+
+        ScrollView scroller = new ScrollView(this);
+        scroller.setFillViewport(true);
+        scroller.addView(listContainer);
+
+        LinearLayout dialogRoot = new LinearLayout(this);
+        dialogRoot.setOrientation(LinearLayout.VERTICAL);
+        int p = dp(16);
+        dialogRoot.setPadding(p, p, p, p);
+        dialogRoot.addView(searchBox, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        LinearLayout.LayoutParams scrollerLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(360)
+        );
+        scrollerLp.topMargin = dp(8);
+        dialogRoot.addView(scroller, scrollerLp);
+
+        currentPickerDialog = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Выберите приложение")
+                .setView(dialogRoot)
                 .setNegativeButton("Отмена", null)
-                .show();
+                .setOnDismissListener(d -> currentPickerDialog = null)
+                .create();
+        currentPickerDialog.show();
+        updateList[0].run();
+    }
+
+    private AlertDialog currentPickerDialog;
+
+    private TextView createHelpText(String text) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextColor(Color.parseColor("#FF9C9EA8"));
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        return tv;
+    }
+
+    private LinearLayout.LayoutParams createHelpLp() {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        lp.topMargin = dp(2);
+        lp.bottomMargin = dp(12);
+        return lp;
     }
 
     private TextView createStatusPill() {

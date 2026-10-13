@@ -1,0 +1,18 @@
+# Build outputs
+.gradle/
+build/
+app/build/
+*.apk
+releases/*.apk
+
+# IDE / editor
+.idea/
+*.iml
+.vscode/
+
+# Local SDK path (machine-specific)
+local.properties
+
+# OS
+.DS_Store
+Thumbs.db

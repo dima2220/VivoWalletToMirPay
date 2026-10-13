@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.vivotomirpay.stub"
-    android:versionCode="100"
-    android:versionName="1.0.0">
+    android:versionCode="133"
+    android:versionName="1.3.3">
 
     <uses-sdk
         android:minSdkVersion="25"
@@ -12,10 +12,19 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <!-- Опциональная короткая вибрация при перехвате двойного нажатия -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Для пресета «Фонарик»: управление вспышкой камеры (только API 23+) -->
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
 
     <queries>
         <package android:name="ru.nspk.mirpay" />
         <package android:name="com.vivo.wallet" />
+        <!-- Пресеты Gemini / Circle to Search: даём заглушке видеть Google-приложение
+             и отдельное приложение Gemini, чтобы getLaunchIntentForPackage работал. -->
+        <package android:name="com.google.android.googlequicksearchbox" />
+        <package android:name="com.google.android.apps.bard" />
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
@@ -26,14 +35,14 @@
     </queries>
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- Метаданные Vivo, которые проверяет системный сервис при двойном нажатии кнопки питания -->
+        <!-- Метаданные Vivo на уровне <application>: их проверяет системный сервис при двойном нажатии кнопки питания -->
         <meta-data
             android:name="com.vivo.wallet.support.typeswing"
             android:value="true" />
@@ -74,6 +83,27 @@
             android:noHistory="true"
             android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|density">
+
+            <!-- Те же метаданные Vivo дублируются внутри самой Activity-обработчика:
+                 некоторые сборки OriginOS/FuntouchOS ищут com.vivo.wallet.* именно на самом
+                 компоненте-обработчике интента NFC_BUS_SWINGSPLASH, а не на <application>.
+                 Дублирование повышает надёжность перехвата на разных прошивках Vivo. -->
+            <meta-data
+                android:name="com.vivo.wallet.support.typeswing"
+                android:value="true" />
+            <meta-data
+                android:name="com.vivo.wallet.nfc.SupportDoubleClick"
+                android:value="true" />
+            <meta-data
+                android:name="com.vivo.wallet.nfc.CommonSupportDoubleClick"
+                android:value="true" />
+            <meta-data
+                android:name="com.vivo.wallet.nfc.supportVersion"
+                android:value="2" />
+            <meta-data
+                android:name="com.vivo.pay.nfc.supportVersion"
+                android:value="1" />
+
             <intent-filter>
                 <action android:name="vivo.intent.action.NFC_BUS_SWINGSPLASH" />
                 <category android:name="android.intent.category.DEFAULT" />
