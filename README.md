@@ -8,14 +8,11 @@
 
 **Double Power Key** (`com.vivotomirpay.stub`) — лёгкое приложение-заглушка для смартфонов **Vivo** и **iQOO** (с прошивками **OriginOS** и **FuntouchOS**), позволяющее переназначить **двойное нажатие кнопки питания** со стандартного китайского кошелька **Vivo Wallet** на:
 
-- запуск **Mir Pay**, **СБПэй**, **Vivo Wallet (ключ)** или **любого установленного приложения**;
+- запуск **Mir Pay**, **СБПэй** или **любого установленного приложения**;
 - переключение **фонарика**;
 - запуск **Circle to Search** (как в MiCts);
 
 Работает **без Root-прав**, **без Shizuku** и **без удаления системных приложений**.
-
-> Проект основан на коде `VivoToMirPay`. Имя и список возможностей расширены по
-> обратной связи из сообщества Vivo / iQOO.
 
 ---
 
@@ -26,7 +23,7 @@
 - 🔦 **Пресет «Фонарик»** — спец-значение `special:torch`. При двойном нажатии кнопки питания вспышка камеры переключается вкл/выкл. Состояние хранится в `SharedPreferences` и синхронизируется с фактическим состоянием `CameraManager` через `setTorchMode`.
 - 🔍 **Пресет «Circle to Search»** — спец-значение `special:circle_to_search`. Тот же механизм, что в проекте [parallelcc/MiCTS](https://github.com/parallelcc/MiCTS): приложение напрямую вызывает скрытый системный API `IVoiceInteractionManagerService.showSessionFromSession()` через reflection + библиотеку `org.lsposed.hiddenapibypass`, передавая Bundle с ключами `omni.entry_point`, `invocation_time_ms`, `micts_trigger`. Система воспринимает это как жест Circle to Search и открывает ассистента по умолчанию (Google). **Не требует root, не требует accessibility, не требует никаких разрешений.**
 - 🎯 **Гибкий выбор приложения для запуска**:
-  - Быстрые пресеты в один тап: **Mir Pay** (`ru.nspk.mirpay`), **СБПэй** (`ru.nspk.sbpay`), **Vivo Wallet — NFC-ключ** (`com.vivo.wallet` / `NewSwipeActivity`), **Фонарик**, **Circle to Search**, **Gemini**.
+  - Быстрые пресеты в один тап: **Mir Pay** (`ru.nspk.mirpay`), **СБПэй** (`ru.nspk.sbpay`), **Фонарик**, **Circle to Search**.
   - Выбор **любого установленного приложения** из встроенного списка **с динамическим поиском** по названию или packageName.
   - Ввод произвольного `packageName` или `special:*` вручную.
 - 🛡️ **Безопасный журнал** — лог последнего срабатывания в `PrefsHelper.saveTriggerLog` обрезается до 1000 символов, а значения каждого extra — до 100 символов, чтобы произвольный отправитель интента не мог раздуть `SharedPreferences` и UI заглушки.
@@ -171,7 +168,7 @@ export VVTM_KEY_PASSWORD=******
 ./gradlew assembleRelease
 ```
 
-Без них `app/build.gradle` использует debug-ключ по умолчанию (`debug.keystore`, пароль `android`, alias `androiddebugkey`). Это удобно для локальной установки, но не подойдёт для публикации в Google Play.
+Без них `app/build.gradle` использует debug-ключ по умолчанию (`debug.keystore`, пароль `android`, alias `androiddebugkey`). Это удобно для локальной установки.
 
 ---
 
