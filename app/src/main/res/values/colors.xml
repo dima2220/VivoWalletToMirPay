@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Светлая палитра (fallback для тем); основной UI красится программно через Ui -->
+    <color name="window_bg">#FEF7FF</color>
+    <color name="accent">#6750A3</color>
+    <color name="ic_launcher_bg">#4F378B</color>
+</resources>

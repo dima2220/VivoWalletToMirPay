@@ -10,8 +10,8 @@ android {
         applicationId "com.vivotomirpay.stub"
         minSdk 25
         targetSdk 35
-        versionCode 133
-        versionName "1.3.3"
+        versionCode 205
+        versionName "2.1.4"
     }
 
     compileOptions {

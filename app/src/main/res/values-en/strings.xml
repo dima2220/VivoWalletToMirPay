@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Double Power Key</string>
+    <string name="swipe_activity_label">Double Power Key</string>
+
+    <!-- Header -->
+    <string name="header_title">Double Power Key</string>
+    <string name="header_subtitle">Remap the double power key press on Vivo / iQOO phones (OriginOS / FuntouchOS)</string>
+
+    <!-- Handler status -->
+    <string name="status_default_ok">✓ Double power press: this app is set as the default handler</string>
+    <string name="status_default_other">⚠ Double power press: currently assigned to %1$s</string>
+    <string name="status_default_none">ℹ No default handler yet — trigger the system dialog and pick “Always”</string>
+    <string name="handler_status_registered">Registered NFC_BUS_SWINGSPLASH handlers (%1$d):</string>
+
+    <!-- Card: main action -->
+    <string name="card_action_title">Double press action</string>
+    <string name="main_action_label">Launch target</string>
+    <string name="btn_change">Change</string>
+    <string name="card_action_hint">An app or one of the special actions: flashlight, camera, VPN, Circle to Search or the action menu. Circle to Search works like MiCTS — via VoiceInteractionService, no root and no accessibility.</string>
+    <string name="action_none_selected">Not selected</string>
+    <string name="subtitle_not_set">Not set</string>
+
+    <!-- Presets -->
+    <string name="preset_mirpay">Mir Pay</string>
+    <string name="preset_sbpay">SBPay</string>
+    <string name="preset_wallet">Wallet (key)</string>
+    <string name="preset_torch">Flashlight</string>
+    <string name="preset_camera">Camera</string>
+    <string name="preset_vpn">VPN</string>
+    <string name="preset_cts">Circle to Search</string>
+    <string name="preset_menu">Menu</string>
+
+    <!-- Special action names -->
+    <string name="name_torch">Flashlight</string>
+    <string name="name_camera">Camera</string>
+    <string name="name_cts">Circle to Search</string>
+    <string name="name_vpn">Toggle VPN</string>
+    <string name="name_vpn_short">VPN: %1$s</string>
+    <string name="name_menu">Action menu</string>
+    <string name="vpn_name_generic">VPN</string>
+
+    <!-- Lock screen -->
+    <string name="card_lock_title">Lock screen</string>
+    <string name="switch_lock">Separate action on the lock screen</string>
+    <string name="lock_hint_on">While the screen is locked, the double press toggles the flashlight or opens the camera right above the lock screen.</string>
+    <string name="lock_hint_off">Disabled: the locked screen runs the same action as the unlocked one.</string>
+    <string name="lock_action_label">Action while locked</string>
+    <string name="card_lock_hint">Turn the switch off and the double press behaves exactly the same on the lock screen as on the unlocked one.</string>
+
+    <!-- Vibration -->
+    <string name="card_vibration_title">Vibration</string>
+    <string name="switch_vibrate">Vibrate on double press</string>
+    <string name="vibrate_duration_label">Pulse duration: %1$d ms</string>
+    <string name="vibrate_pattern_label">Pattern</string>
+    <string name="pattern_single">Single</string>
+    <string name="pattern_double">Double</string>
+    <string name="pattern_long">Long</string>
+    <string name="card_vibration_hint">Haptic feedback confirms the double press was captured and the action started.</string>
+
+    <!-- VPN -->
+    <string name="card_vpn_title">VPN action</string>
+    <string name="vpn_client_auto">Auto</string>
+    <string name="vpn_status_installed">Installed: %1$s</string>
+    <string name="vpn_status_not_installed_short">Client not found</string>
+    <string name="vpn_state_active">VPN active</string>
+    <string name="vpn_none_found">not found</string>
+    <string name="vpn_state_inactive">VPN inactive</string>
+    <string name="card_vpn_hint">The “VPN” action toggles the selected client in the background — no app UI is ever shown. Happ uses the official happ://toggle_without_ui deeplink (no-UI interceptor) and the widget command; incy uses the llc.itdev.incy.TOGGLE broadcast to its system receiver. No root required. “Auto” picks the first installed client. If toggling does not work, open Happ → Settings and enable deeplink control, then check the log at the bottom of this screen.</string>
+
+    <!-- Action menu -->
+    <string name="card_menu_title">Action menu</string>
+    <string name="menu_desc">If the double press action is set to “Action menu”, the press opens a customizable panel: add both actions (flashlight, camera, VPN…) and any apps. The menu works above the lock screen too.</string>
+    <string name="btn_menu_preview">Preview menu</string>
+    <string name="btn_menu_edit">Edit menu</string>
+    <string name="menu_title">Action menu</string>
+    <string name="menu_subtitle">Choose what to launch</string>
+    <string name="menu_empty">The menu is empty. Add items in the app settings.</string>
+    <string name="menu_item_torch">Flashlight</string>
+    <string name="menu_item_camera">Camera</string>
+    <string name="menu_item_cts">Circle to Search</string>
+    <string name="menu_item_vpn">VPN: %1$s</string>
+
+    <!-- Menu editor -->
+    <string name="editor_menu_title">Edit menu</string>
+    <string name="editor_hint">Items launch with one tap. Arrows reorder, the cross deletes. Changes are saved instantly.</string>
+    <string name="editor_add_action">Add action…</string>
+    <string name="editor_add_app">Add app…</string>
+    <string name="editor_empty">Menu is empty</string>
+    <string name="editor_already_in_menu">Already in the menu</string>
+    <string name="editor_menu_full">The menu holds up to 16 items</string>
+
+    <!-- Action picker -->
+    <string name="picker_title_main">Double press action</string>
+    <string name="picker_section_specials">Actions</string>
+    <string name="picker_section_apps">Apps</string>
+    <string name="picker_search_hint">Search by name or package…</string>
+    <string name="picker_no_apps">Nothing found</string>
+    <string name="btn_close">Close</string>
+
+    <!-- Power handler -->
+    <string name="card_handler_title">Power key handler</string>
+    <string name="btn_test">Test the action</string>
+    <string name="btn_test_hint">Simulates the double power press without changing the system handler.</string>
+    <string name="btn_resolve">Trigger NFC_BUS_SWINGSPLASH (“Always”)</string>
+    <string name="btn_resolve_hint">Sends the same system Intent Vivo sends on a double press. Pick “Always” in the chooser to make this app the permanent handler.</string>
+    <string name="btn_appinfo">Current handler app info</string>
+    <string name="btn_appinfo_hint">Opens system settings for the currently assigned handler app. Reset the default there to bring the “Always” dialog back.</string>
+
+    <!-- Assistant -->
+    <string name="card_assistant_title">Default assistant</string>
+    <string name="assistant_hint">Circle to Search launches the assistant chosen in the system. To make it open Gemini, enable Gemini in the Google app: profile → Settings → Gemini.</string>
+    <string name="assistant_ok">✓ Assistant: %1$s. Circle to Search will open Gemini.</string>
+    <string name="assistant_google">ℹ Assistant: %1$s. Circle to Search will open Google. Switch below if you prefer Gemini.</string>
+    <string name="assistant_warn">⚠ Assistant: %1$s. Tap the button below and choose Google or Gemini.</string>
+    <string name="assistant_none">not set</string>
+    <string name="assistant_read_error">read error</string>
+    <string name="btn_assistant">Change assistant</string>
+
+    <!-- Log -->
+    <string name="card_log_title">Last trigger log</string>
+    <string name="card_log_hint">Action and extras are trimmed to 100 chars, the whole log to 1000. This protects the app from being bloated by arbitrary intents.</string>
+    <string name="btn_log_clear">Clear</string>
+    <string name="log_empty">Log is empty — the double press has not fired yet.</string>
+
+    <!-- About -->
+
+    <!-- VPN action statuses (log) -->
+    <string name="vpn_status_not_installed">%1$s is not installed</string>
+    <string name="vpn_status_ok">%1$s: “%2$s” command sent (%3$s)</string>
+    <string name="vpn_status_opened_app">%1$s opened manually (%2$s)</string>
+    <string name="vpn_status_failed">Failed to launch %1$s</string>
+    <string name="vpn_status_no_path">%1$s: no control path found (deeplink and widget unavailable). Update the client app to the latest version.</string>
+    <string name="picker_current_mark">✓ %1$s</string>
+    <string name="vpn_state_was_active">VPN was active before</string>
+    <string name="vpn_state_was_inactive">VPN was inactive before</string>
+
+    <!-- Log entries -->
+    <string name="log_reason_not_set">Target action is not set</string>
+    <string name="log_reason_self">Target action points to the app itself</string>
+    <string name="log_action_failed">Action error: %1$s</string>
+    <string name="log_menu_opened">Action menu opened</string>
+    <string name="log_menu_failed">Menu failed to open: %1$s</string>
+    <string name="log_unknown_special">Unknown special value: %1$s</string>
+    <string name="log_torch_api">Flashlight is not supported below API 23</string>
+    <string name="log_torch_no_manager">CameraManager unavailable</string>
+    <string name="log_torch_no_flash">No camera with a flash found</string>
+    <string name="log_torch_on">Flashlight ON</string>
+    <string name="log_torch_off">Flashlight off</string>
+    <string name="log_torch_error">Flashlight error: %1$s</string>
+    <string name="log_camera_not_found">No camera app found on the device</string>
+    <string name="log_camera_ok">Camera launched</string>
+
+    <string name="log_camera_ok_secure">Camera launched (secure mode for the lock screen)</string>    <string name="log_camera_error">Camera launch error: %1$s</string>
+    <string name="log_cts_no_service">Circle to Search: voiceinteraction service unavailable</string>
+    <string name="log_cts_no_interface">Circle to Search: IVoiceInteractionManagerService unavailable</string>
+    <string name="log_cts_ok">Circle to Search: session started. Assistant: %1$s</string>
+    <string name="log_cts_false">Circle to Search: the system returned false. Assistant: %1$s</string>
+    <string name="log_cts_error">Circle to Search failed: %1$s</string>
+    <string name="log_wallet_ok">Vivo Wallet key launched (NewSwipeActivity)</string>
+    <string name="log_app_ok">Launched: %1$s</string>
+    <string name="log_app_error">Launch error: %1$s</string>
+    <string name="log_app_not_found">App not found or not launchable: %1$s</string>
+</resources>

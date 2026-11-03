@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.vivotomirpay.stub"
-    android:versionCode="133"
-    android:versionName="1.3.3">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-sdk
-        android:minSdkVersion="25"
-        android:targetSdkVersion="35" />
-
-    <!-- Для чтения списка установленных приложений и запуска Mir Pay / любого выбранного пакета -->
+    <!-- Для чтения списка установленных приложений и запуска любого выбранного пакета -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-    <!-- Опциональная короткая вибрация при перехвате двойного нажатия -->
+    <!-- Виброотклик при перехвате двойного нажатия -->
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- Для пресета «Фонарик»: управление вспышкой камеры (только API 23+) -->
+    <!-- Для пресета «Фонарик»: управление вспышкой камеры -->
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <!-- Определение активного VPN (TRANSPORT_VPN) — публичный API -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-feature
         android:name="android.hardware.camera.flash"
         android:required="false" />
 
     <queries>
+        <!-- Пресеты оплаты -->
         <package android:name="ru.nspk.mirpay" />
         <package android:name="com.vivo.wallet" />
-        <!-- Пресеты Gemini / Circle to Search: даём заглушке видеть Google-приложение
-             и отдельное приложение Gemini, чтобы getLaunchIntentForPackage работал. -->
+        <!-- Circle to Search / Gemini -->
         <package android:name="com.google.android.googlequicksearchbox" />
         <package android:name="com.google.android.apps.bard" />
+        <!-- VPN-клиенты: Happ (новый и старый пакеты) и incy -->
+        <package android:name="su.happ.proxyutility" />
+        <package android:name="com.happproxy" />
+        <package android:name="llc.itdev.incy" />
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
         <intent>
             <action android:name="vivo.intent.action.NFC_BUS_SWINGSPLASH" />
+        </intent>
+        <intent>
+            <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
         </intent>
     </queries>
 
@@ -59,7 +61,7 @@
             android:name="com.vivo.pay.nfc.supportVersion"
             android:value="1" />
 
-        <!-- Главное окно настройки заглушки в стиле Android 13 -->
+        <!-- Главное окно настроек в стиле Material You -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -86,8 +88,7 @@
 
             <!-- Те же метаданные Vivo дублируются внутри самой Activity-обработчика:
                  некоторые сборки OriginOS/FuntouchOS ищут com.vivo.wallet.* именно на самом
-                 компоненте-обработчике интента NFC_BUS_SWINGSPLASH, а не на <application>.
-                 Дублирование повышает надёжность перехвата на разных прошивках Vivo. -->
+                 компоненте-обработчике интента NFC_BUS_SWINGSPLASH. -->
             <meta-data
                 android:name="com.vivo.wallet.support.typeswing"
                 android:value="true" />
@@ -109,6 +110,26 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Настраиваемое меню действий (special:menu).
+             showWhenLocked/turnScreenOn задаются в коде; тема — полупрозрачная. -->
+        <activity
+            android:name=".MenuActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.vivotomirpay.stub.menu"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|density"
+            android:theme="@style/MenuTheme" />
+
+        <!-- Экран настройки меню действий -->
+        <activity
+            android:name=".MenuEditorActivity"
+            android:exported="false"
+            android:label="@string/editor_menu_title"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
 
     </application>
 

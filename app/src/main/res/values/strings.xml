@@ -2,4 +2,163 @@
 <resources>
     <string name="app_name">Double Power Key</string>
     <string name="swipe_activity_label">Double Power Key</string>
+
+    <!-- Заголовок -->
+    <string name="header_title">Double Power Key</string>
+    <string name="header_subtitle">Переназначение двойного нажатия кнопки питания для Vivo / iQOO (OriginOS / FuntouchOS)</string>
+
+    <!-- Статус обработчика -->
+    <string name="status_default_ok">✓ Двойное нажатие питания: эта заглушка назначена обработчиком по умолчанию</string>
+    <string name="status_default_other">⚠ Двойное нажатие питания: сейчас выбрано %1$s</string>
+    <string name="status_default_none">ℹ Обработчик двойного нажатия ещё не зафиксирован — вызовите системный диалог и выберите «Всегда»</string>
+    <string name="handler_status_registered">Зарегистрированные обработчики NFC_BUS_SWINGSPLASH (%1$d):</string>
+
+    <!-- Карточка: действие двойного нажатия -->
+    <string name="card_action_title">Действие двойного нажатия</string>
+    <string name="main_action_label">Что запускать</string>
+    <string name="btn_change">Изменить</string>
+    <string name="card_action_hint">Приложение или одно из спец-действий: фонарик, камера, VPN, Circle to Search или меню действий. Circle to Search работает как в MiCTS — через VoiceInteractionService, без root и accessibility.</string>
+    <string name="action_none_selected">Не выбрано</string>
+    <string name="subtitle_not_set">Не задано</string>
+
+    <!-- Пресеты -->
+    <string name="preset_mirpay">Mir Pay</string>
+    <string name="preset_sbpay">СБПэй</string>
+    <string name="preset_wallet">Wallet (ключ)</string>
+    <string name="preset_torch">Фонарик</string>
+    <string name="preset_camera">Камера</string>
+    <string name="preset_vpn">VPN</string>
+    <string name="preset_cts">Circle to Search</string>
+    <string name="preset_menu">Меню</string>
+
+    <!-- Имена спец-действий -->
+    <string name="name_torch">Фонарик</string>
+    <string name="name_camera">Камера</string>
+    <string name="name_cts">Circle to Search</string>
+    <string name="name_vpn">Переключить VPN</string>
+    <string name="name_vpn_short">VPN: %1$s</string>
+    <string name="name_menu">Меню действий</string>
+    <string name="vpn_name_generic">VPN</string>
+
+    <!-- Экран блокировки -->
+    <string name="card_lock_title">Заблокированный экран</string>
+    <string name="switch_lock">Отдельное действие на заблокированном экране</string>
+    <string name="lock_hint_on">При заблокированном экране двойное нажатие включает фонарик или открывает камеру прямо поверх блокировки.</string>
+    <string name="lock_hint_off">Настройка отключена: на заблокированном экране выполняется то же действие, что и на разблокированном.</string>
+    <string name="lock_action_label">Действие при блокировке</string>
+    <string name="card_lock_hint">Отключите переключатель — и двойное нажатие на заблокированном экране будет работать точно так же, как на разблокированном.</string>
+
+    <!-- Вибрация -->
+    <string name="card_vibration_title">Вибрация</string>
+    <string name="switch_vibrate">Вибрация при двойном нажатии</string>
+    <string name="vibrate_duration_label">Длительность импульса: %1$d мс</string>
+    <string name="vibrate_pattern_label">Паттерн</string>
+    <string name="pattern_single">Один</string>
+    <string name="pattern_double">Двойная</string>
+    <string name="pattern_long">Длинная</string>
+    <string name="card_vibration_hint">Отклик подтверждает, что двойное нажатие перехвачено и действие запущено.</string>
+
+    <!-- VPN -->
+    <string name="card_vpn_title">VPN-действие</string>
+    <string name="vpn_client_auto">Авто</string>
+    <string name="vpn_status_installed">Установлен: %1$s</string>
+    <string name="vpn_status_not_installed_short">Клиент не найден</string>
+    <string name="vpn_state_active">VPN активен</string>
+    <string name="vpn_none_found">не найден</string>
+    <string name="vpn_state_inactive">VPN не активен</string>
+    <string name="card_vpn_hint">Действие «VPN» переключает подключение выбранного клиента в фоне — интерфейс приложений не открывается. Happ — официальный deeplink happ://toggle_without_ui (перехватчик без UI) и команда виджета; incy — broadcast llc.itdev.incy.TOGGLE в системный ресивер. Без root. «Авто» берёт первый установленный клиент. Если переключение не срабатывает — откройте Happ → Настройки и включите управление по deeplink, затем проверьте журнал в конце этого экрана.</string>
+
+    <!-- Меню действий -->
+    <string name="card_menu_title">Меню действий</string>
+    <string name="menu_desc">Если действием выбрано «Меню действий», двойное нажатие открывает настраиваемую панель: в неё можно добавить и действия (фонарик, камера, VPN…), и любые приложения. Меню работает и на заблокированном экране.</string>
+    <string name="btn_menu_preview">Показать меню</string>
+    <string name="btn_menu_edit">Настроить меню</string>
+    <string name="menu_title">Меню действий</string>
+    <string name="menu_subtitle">Выберите, что запустить</string>
+    <string name="menu_empty">Меню пустое. Добавьте пункты в настройках приложения.</string>
+    <string name="menu_item_torch">Фонарик</string>
+    <string name="menu_item_camera">Камера</string>
+    <string name="menu_item_cts">Circle to Search</string>
+    <string name="menu_item_vpn">VPN: %1$s</string>
+
+    <!-- Редактор меню -->
+    <string name="editor_menu_title">Настройка меню</string>
+    <string name="editor_hint">Пункты запускаются одним тапом. Стрелки меняют порядок, крестик удаляет. Изменения сохраняются сразу.</string>
+    <string name="editor_add_action">Добавить действие…</string>
+    <string name="editor_add_app">Добавить приложение…</string>
+    <string name="editor_empty">Меню пустое</string>
+    <string name="editor_already_in_menu">Уже есть в меню</string>
+    <string name="editor_menu_full">В меню максимум 16 пунктов</string>
+
+    <!-- Пикер действий -->
+    <string name="picker_title_main">Действие двойного нажатия</string>
+    <string name="picker_section_specials">Действия</string>
+    <string name="picker_section_apps">Приложения</string>
+    <string name="picker_search_hint">Поиск по названию или имени пакета…</string>
+    <string name="picker_no_apps">Ничего не найдено</string>
+    <string name="btn_close">Закрыть</string>
+
+    <!-- Обработчик кнопки питания -->
+    <string name="card_handler_title">Обработчик кнопки питания</string>
+    <string name="btn_test">Проверить действие</string>
+    <string name="btn_test_hint">Имитирует двойное нажатие питания, не меняя системного обработчика.</string>
+    <string name="btn_resolve">Вызвать NFC_BUS_SWINGSPLASH («Всегда»)</string>
+    <string name="btn_resolve_hint">Отправляет тот же системный Intent, что Vivo при двойном нажатии. В окне выбора отметьте «Всегда» — и заглушка станет постоянным обработчиком.</string>
+    <string name="btn_appinfo">Свойства текущего обработчика</string>
+    <string name="btn_appinfo_hint">Открывает настройки приложения, назначенного обработчиком. Там можно сбросить выбор, чтобы снова вызвать окно «Всегда».</string>
+
+    <!-- Ассистент -->
+    <string name="card_assistant_title">Ассистент по умолчанию</string>
+    <string name="assistant_hint">Circle to Search открывает ассистента, выбранного в системе. Чтобы Circle to Search запускал Gemini, включите его в приложении Google: профиль → Настройки → Gemini.</string>
+    <string name="assistant_ok">✓ Ассистент: %1$s. Circle to Search откроет Gemini.</string>
+    <string name="assistant_google">ℹ Ассистент: %1$s. Circle to Search откроет Google. Хотите Gemini — переключите кнопкой ниже.</string>
+    <string name="assistant_warn">⚠ Ассистент: %1$s. Нажмите кнопку ниже и выберите Google или Gemini.</string>
+    <string name="assistant_none">не задан</string>
+    <string name="assistant_read_error">ошибка чтения</string>
+    <string name="btn_assistant">Изменить ассистента</string>
+
+    <!-- Журнал -->
+    <string name="card_log_title">Журнал последнего вызова</string>
+    <string name="card_log_hint">Action и extras обрезаются до 100 символов, весь лог — до 1000. Это защищает приложение от раздувания произвольными интентами.</string>
+    <string name="btn_log_clear">Очистить</string>
+    <string name="log_empty">Журнал пуст — двойное нажатие ещё не срабатывало.</string>
+
+    <!-- О приложении -->
+
+    <!-- Статусы VPN-действия (в журнал) -->
+    <string name="vpn_status_not_installed">Приложение %1$s не установлено</string>
+    <string name="vpn_status_ok">%1$s: команда «%2$s» отправлена (%3$s)</string>
+    <string name="vpn_status_opened_app">%1$s открыт вручную (%2$s)</string>
+    <string name="vpn_status_failed">Не удалось запустить %1$s</string>
+    <string name="vpn_status_no_path">%1$s: не найден способ управления (deeplink и виджет недоступны). Обновите приложение-клиент до актуальной версии.</string>
+    <string name="picker_current_mark">✓ %1$s</string>
+    <string name="vpn_state_was_active">до команды VPN был активен</string>
+    <string name="vpn_state_was_inactive">до команды VPN не был активен</string>
+
+    <!-- Записи журнала -->
+    <string name="log_reason_not_set">Целевое действие не задано</string>
+    <string name="log_reason_self">Целевое действие указывает на само приложение-заглушку</string>
+    <string name="log_action_failed">Ошибка действия: %1$s</string>
+    <string name="log_menu_opened">Открыто меню действий</string>
+    <string name="log_menu_failed">Меню не открылось: %1$s</string>
+    <string name="log_unknown_special">Неизвестное спец-значение: %1$s</string>
+    <string name="log_torch_api">Фонарик не поддерживается на API &lt; 23</string>
+    <string name="log_torch_no_manager">CameraManager недоступен</string>
+    <string name="log_torch_no_flash">Не найдено ни одной камеры с вспышкой</string>
+    <string name="log_torch_on">Фонарик ВКЛЮЧЁН</string>
+    <string name="log_torch_off">Фонарик выключен</string>
+    <string name="log_torch_error">Ошибка фонарика: %1$s</string>
+    <string name="log_camera_not_found">Камера не найдена на устройстве</string>
+    <string name="log_camera_ok">Камера запущена</string>
+
+    <string name="log_camera_ok_secure">Камера запущена (secure-режим для экрана блокировки)</string>    <string name="log_camera_error">Ошибка запуска камеры: %1$s</string>
+    <string name="log_cts_no_service">Circle to Search: сервис voiceinteraction недоступен</string>
+    <string name="log_cts_no_interface">Circle to Search: IVoiceInteractionManagerService недоступен</string>
+    <string name="log_cts_ok">Circle to Search: сессия запущена. Ассистент: %1$s</string>
+    <string name="log_cts_false">Circle to Search: система вернула false. Ассистент: %1$s</string>
+    <string name="log_cts_error">Circle to Search не сработал: %1$s</string>
+    <string name="log_wallet_ok">Запущен ключ Vivo Wallet (NewSwipeActivity)</string>
+    <string name="log_app_ok">Запущено: %1$s</string>
+    <string name="log_app_error">Ошибка запуска: %1$s</string>
+    <string name="log_app_not_found">Приложение не найдено или не запускается: %1$s</string>
 </resources>
